@@ -19,6 +19,8 @@ maestro test .maestro/diagnose.yaml  # prints the count after each tap
 
 The bug goes away with `enableNativeEventTargetEventDispatching` set to false.
 
+Video of the bug on stock 0.88.0 (iOS simulator): [media/stock-0.88.0-lost-tap.mp4](media/stock-0.88.0-lost-tap.mp4).
+
 ---
 
 # React Native Reproducer
