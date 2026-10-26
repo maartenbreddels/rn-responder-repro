@@ -1,0 +1,93 @@
+diff --git a/node_modules/react-native/Libraries/Renderer/implementations/ReactFabric-dev.js b/node_modules/react-native/Libraries/Renderer/implementations/ReactFabric-dev.js
+index 615eb91..3bc88eb 100644
+--- a/node_modules/react-native/Libraries/Renderer/implementations/ReactFabric-dev.js
++++ b/node_modules/react-native/Libraries/Renderer/implementations/ReactFabric-dev.js
+@@ -1307,12 +1307,11 @@ __DEV__ &&
+           (_enableNativeEventTargetEventDispatching =
+             "function" === typeof event && event()));
+         if (_enableNativeEventTargetEventDispatching)
+-          null != eventTarget &&
+-            reactPrivateInterface.dispatchNativeEvent(
+-              eventTarget,
+-              topLevelType,
+-              nativeEvent
+-            );
++          reactPrivateInterface.dispatchNativeEvent(
++            eventTarget,
++            topLevelType,
++            nativeEvent
++          );
+         else {
+           event = eventTarget;
+           for (
+diff --git a/node_modules/react-native/Libraries/Renderer/implementations/ReactFabric-prod.js b/node_modules/react-native/Libraries/Renderer/implementations/ReactFabric-prod.js
+index bf3cacd..3905147 100644
+--- a/node_modules/react-native/Libraries/Renderer/implementations/ReactFabric-prod.js
++++ b/node_modules/react-native/Libraries/Renderer/implementations/ReactFabric-prod.js
+@@ -1338,12 +1338,11 @@ function dispatchEvent(target, topLevelType, nativeEventParam) {
+       (_enableNativeEventTargetEventDispatching =
+         "function" === typeof event && event()));
+     if (_enableNativeEventTargetEventDispatching)
+-      null != eventTarget &&
+-        reactPrivateInterface.dispatchNativeEvent(
+-          eventTarget,
+-          topLevelType,
+-          nativeEvent
+-        );
++      reactPrivateInterface.dispatchNativeEvent(
++        eventTarget,
++        topLevelType,
++        nativeEvent
++      );
+     else {
+       event = eventTarget;
+       for (
+diff --git a/node_modules/react-native/Libraries/Renderer/implementations/ReactFabric-profiling.js b/node_modules/react-native/Libraries/Renderer/implementations/ReactFabric-profiling.js
+index 1934f48..ef5d06d 100644
+--- a/node_modules/react-native/Libraries/Renderer/implementations/ReactFabric-profiling.js
++++ b/node_modules/react-native/Libraries/Renderer/implementations/ReactFabric-profiling.js
+@@ -1405,12 +1405,11 @@ function dispatchEvent(target, topLevelType, nativeEventParam) {
+       (_enableNativeEventTargetEventDispatching =
+         "function" === typeof event && event()));
+     if (_enableNativeEventTargetEventDispatching)
+-      null != eventTarget &&
+-        reactPrivateInterface.dispatchNativeEvent(
+-          eventTarget,
+-          topLevelType,
+-          nativeEvent
+-        );
++      reactPrivateInterface.dispatchNativeEvent(
++        eventTarget,
++        topLevelType,
++        nativeEvent
++      );
+     else {
+       event = eventTarget;
+       for (
+diff --git a/node_modules/react-native/src/private/renderer/events/dispatchNativeEvent.js b/node_modules/react-native/src/private/renderer/events/dispatchNativeEvent.js
+index f733308..5322232 100644
+--- a/node_modules/react-native/src/private/renderer/events/dispatchNativeEvent.js
++++ b/node_modules/react-native/src/private/renderer/events/dispatchNativeEvent.js
+@@ -37,13 +37,21 @@ import {
+  * enableNativeEventTargetEventDispatching is enabled.
+  */
+ export default function dispatchNativeEvent(
+-  target: EventTarget,
++  target: EventTarget | null,
+   type: string,
+   payload: {[string]: unknown},
+ ): void {
+   // Process responder events before normal event dispatch.
++  // Do this also when the target is gone (the view unmounted during the
++  // gesture): a touch end must still reach the responder system, or it keeps
++  // a stale responder and a wrong touch count, and later taps get lost.
+   processResponderEvent(type, target, payload);
+ 
++  if (target == null) {
++    rethrowCaughtError();
++    return;
++  }
++
+   try {
+     // Normal EventTarget dispatch
+     const bubbleConfig = customBubblingEventTypes[type];
