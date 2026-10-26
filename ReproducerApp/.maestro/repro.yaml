@@ -1,0 +1,18 @@
+# Run: maestro test .maestro/repro.yaml (with a Release build installed)
+appId: org.reactjs.native.example.ReproducerApp
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+# onPressIn unmounts this button while the finger is down.
+- tapOn: "Remove me"
+- assertVisible: "Tap count: 0"
+# Case 1: the first tap after the unmount must count.
+- tapOn: "Count"
+- assertVisible: "Tap count: 1"
+# Case 2: the first tap after typing in a TextInput must count.
+- tapOn:
+    id: "input"
+- inputText: "abc"
+- tapOn: "Count"
+- assertVisible: "Tap count: 2"

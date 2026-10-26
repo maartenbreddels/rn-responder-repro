@@ -1,3 +1,24 @@
+# Repro: a lost tap after a view unmounts during a touch (RN 0.88, iOS)
+
+Steps (see `ReproducerApp/App.tsx`):
+
+1. Tap "Remove me". Its `onPressIn` unmounts it while the finger is down.
+2. Tap "Count". Expected "Tap count: 1". Actual: the tap is lost, the count stays 0.
+3. Type in the text field, then tap "Count". Expected +1. Actual: this tap is lost too.
+
+Automated check with [Maestro](https://maestro.dev) on an iOS simulator:
+
+```sh
+cd ReproducerApp && yarn install && (cd ios && pod install)
+yarn react-native run-ios --mode Release
+maestro test .maestro/repro.yaml     # fails at "Tap count: 1"
+maestro test .maestro/diagnose.yaml  # prints the count after each tap
+```
+
+The bug goes away with `enableNativeEventTargetEventDispatching` set to false.
+
+---
+
 # React Native Reproducer
 
 > [!IMPORTANT]  

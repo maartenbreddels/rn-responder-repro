@@ -1,0 +1,33 @@
+# Prints the count after each tap: the last step fails on purpose and shows
+# "REPORT a=... b=... c=... d=..." with the values read from the screen.
+appId: org.reactjs.native.example.ReproducerApp
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- tapOn: "Remove me"
+- assertVisible: "Tap count: 0"
+- tapOn: "Count"
+- waitForAnimationToEnd
+- copyTextFrom:
+    text: "Tap count: .*"
+- evalScript: ${output.a = maestro.copiedText}
+- tapOn: "Count"
+- waitForAnimationToEnd
+- copyTextFrom:
+    text: "Tap count: .*"
+- evalScript: ${output.b = maestro.copiedText}
+- tapOn:
+    id: "input"
+- inputText: "abc"
+- tapOn: "Count"
+- waitForAnimationToEnd
+- copyTextFrom:
+    text: "Tap count: .*"
+- evalScript: ${output.c = maestro.copiedText}
+- tapOn: "Count"
+- waitForAnimationToEnd
+- copyTextFrom:
+    text: "Tap count: .*"
+- evalScript: ${output.d = maestro.copiedText}
+- assertVisible: "REPORT a=${output.a} b=${output.b} c=${output.c} d=${output.d}"
