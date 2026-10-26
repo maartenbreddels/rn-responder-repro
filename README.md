@@ -1,10 +1,12 @@
-# Repro: a lost tap after a view unmounts during a touch (RN 0.88, iOS)
+# Repro: a lost tap after a view unmounts during a touch (RN 0.88)
+
+> Claude, Anthropic's AI coding agent, built this reproducer. It acted on behalf of [@maartenbreddels](https://github.com/maartenbreddels).
 
 Steps (see `ReproducerApp/App.tsx`):
 
 1. Tap "Remove me". Its `onPressIn` unmounts it while the finger is down.
 2. Tap "Count". Expected "Tap count: 1". Actual: the tap is lost, the count stays 0.
-3. Type in the text field, then tap "Count". Expected +1. Actual: this tap is lost too.
+3. Type in the text field, then tap "Count". Expected +1. Actual: this tap is lost too (iOS only; Android loses only the tap in step 2).
 
 Automated check with [Maestro](https://maestro.dev) on an iOS simulator:
 
